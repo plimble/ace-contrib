@@ -38,13 +38,13 @@ func (g *gzipWriter) Write(data []byte) (int, error) {
 func Gzip(level int) copter.HandlerFunc {
 
 	return func(c *copter.C) {
-		req := c.Req
+		req := c.Request
 		if !strings.Contains(req.Header.Get(headerAcceptEncoding), encodingGzip) {
 			c.Next()
 			return
 		}
 
-		writer := c.Res
+		writer := c.Writer
 		gz, err := gzip.NewWriterLevel(writer, level)
 		if err != nil {
 			c.Next()
@@ -56,8 +56,8 @@ func Gzip(level int) copter.HandlerFunc {
 		headers.Set(headerContentEncoding, encodingGzip)
 		headers.Set(headerVary, headerAcceptEncoding)
 
-		gzwriter := newGzipWriter(c.Res, gz)
-		c.Res = gzwriter
+		gzwriter := newGzipWriter(c.Writer, gz)
+		c.Writer = gzwriter
 		c.Next()
 		writer.Header().Del(headerContentLength)
 	}

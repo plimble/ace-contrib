@@ -20,7 +20,7 @@ func newServer(useGzip bool) *copter.Copter {
 		r.Use(Gzip(DefaultCompression))
 	}
 	r.GET("/", func(c *copter.C) {
-		c.Res.Header().Set(headerContentLength, strconv.Itoa(len(testResponse)))
+		c.Writer.Header().Set(headerContentLength, strconv.Itoa(len(testResponse)))
 		c.String(200, testResponse)
 	})
 	return r
