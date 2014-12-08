@@ -3,6 +3,7 @@ package throttled
 import (
 	"bytes"
 	"fmt"
+	"net"
 	"net/http"
 	"strings"
 )
@@ -54,8 +55,9 @@ func (vb *VaryBy) Key(r *http.Request) string {
 		sep = "\n" // Separator defaults to newline
 	}
 	if vb.RemoteAddr {
-		fmt.Println(r.RemoteAddr, strings.ToLower(r.RemoteAddr)+sep)
-		buf.WriteString(strings.ToLower(r.RemoteAddr) + sep)
+		ip, _, _ := net.SplitHostPort(r.RemoteAddr)
+		fmt.Println(ip)
+		buf.WriteString(strings.ToLower(ip) + sep)
 	}
 	if vb.Method {
 		buf.WriteString(strings.ToLower(r.Method) + sep)
