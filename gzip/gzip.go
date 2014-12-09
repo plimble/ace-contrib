@@ -3,7 +3,6 @@ package gzip
 import (
 	"compress/gzip"
 	"github.com/plimble/copter"
-	"net/http"
 	"strings"
 )
 
@@ -23,11 +22,11 @@ const (
 )
 
 type gzipWriter struct {
-	http.ResponseWriter
+	copter.ResponseWriter
 	gzwriter *gzip.Writer
 }
 
-func newGzipWriter(writer http.ResponseWriter, gzwriter *gzip.Writer) *gzipWriter {
+func newGzipWriter(writer copter.ResponseWriter, gzwriter *gzip.Writer) *gzipWriter {
 	return &gzipWriter{writer, gzwriter}
 }
 
