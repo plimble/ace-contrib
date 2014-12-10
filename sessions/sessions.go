@@ -1,3 +1,26 @@
+// Package sessions contains middleware for easy session management in Negroni.
+// Based on github.com/martini-contrib/sessions
+//
+//	package main
+//
+//	import (
+//		"github.com/codegangsta/negroni"
+//		"github.com/goincremental/negroni-sessions"
+//		"net/http"
+//	)
+//
+//	func main() {
+//	n := negroni.Classic()
+//
+//		store := sessions.NewCookieStore([]byte("secret123"))
+//		n.Use(sessions.Sessions("my_session", store))
+//
+//		mux := http.NewServeMux()
+//		mux.HandleFunc("/", func(w http.ResponseWriter, req *http.Request) {
+//			session := sessions.GetSession(req)
+//			session.Set("hello", "world")
+//		})
+//	}
 package sessions
 
 import (
@@ -56,18 +79,27 @@ type Session interface {
 	Flashes(vars ...string) []interface{}
 	// Options sets confuguration for a session.
 	Options(Options)
+	IsNew() bool
 }
 
-// Sessions is a Middleware that maps a session.Session service into the gin handler chain.
+// Sessions is a Middleware that maps a session.Session service into the negroni handler chain.
 // Sessions can use a number of storage solutions with the given store.
 func Sessions(name string, store Store) ace.HandlerFunc {
 	return func(c *ace.C) {
-		s := &session{name, c.Request, store, nil, false}
+		// Map to the Session interface
+		s := &session{name, c.Request, store, nil, false, false}
 		context.Set(c.Request, sessionKey, s)
+		// Use before hook to save out the session
+		rw := c.Writer
+		rw.Before(func(ace.ResponseWriter) {
+			if s.Written() {
+				check(s.Session().Save(c.Request, c.Writer))
+			}
+		})
 
-		defer func() {
-			context.Clear(c.Request)
-		}()
+		// clear the context, we don't need to use
+		// gorilla context and we don't want memory leaks
+		defer context.Clear(c.Request)
 
 		c.Next()
 	}
@@ -79,10 +111,11 @@ type session struct {
 	store   Store
 	session *sessions.Session
 	written bool
+	isNew   bool
 }
 
 // GetSession returns the session stored in the request context
-func GetSession(req *http.Request) *session {
+func GetSession(req *http.Request) Session {
 	return context.Get(req, sessionKey).(*session)
 }
 
@@ -130,6 +163,7 @@ func (s *session) Session() *sessions.Session {
 	if s.session == nil {
 		var err error
 		s.session, err = s.store.Get(s.request, s.name)
+		s.isNew = s.session.IsNew
 		check(err)
 	}
 
@@ -138,6 +172,10 @@ func (s *session) Session() *sessions.Session {
 
 func (s *session) Written() bool {
 	return s.written
+}
+
+func (s *session) IsNew() bool {
+	return s.isNew
 }
 
 func check(err error) {
