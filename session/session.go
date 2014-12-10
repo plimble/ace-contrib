@@ -2,11 +2,11 @@ package session
 
 import (
 	"github.com/gorilla/context"
-	"github.com/plimble/copter"
+	"github.com/plimble/ace"
 )
 
-func Sessions() copter.HandlerFunc {
-	return func(c *copter.C) {
+func Sessions() ace.HandlerFunc {
+	return func(c *ace.C) {
 		defer context.Clear(c.Request)
 		c.Next()
 	}

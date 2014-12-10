@@ -2,7 +2,7 @@ package gzip
 
 import (
 	"compress/gzip"
-	"github.com/plimble/copter"
+	"github.com/plimble/ace"
 	"strings"
 )
 
@@ -22,11 +22,11 @@ const (
 )
 
 type gzipWriter struct {
-	copter.ResponseWriter
+	ace.ResponseWriter
 	gzwriter *gzip.Writer
 }
 
-func newGzipWriter(writer copter.ResponseWriter, gzwriter *gzip.Writer) *gzipWriter {
+func newGzipWriter(writer ace.ResponseWriter, gzwriter *gzip.Writer) *gzipWriter {
 	return &gzipWriter{writer, gzwriter}
 }
 
@@ -34,9 +34,9 @@ func (g *gzipWriter) Write(data []byte) (int, error) {
 	return g.gzwriter.Write(data)
 }
 
-func Gzip(level int) copter.HandlerFunc {
+func Gzip(level int) ace.HandlerFunc {
 
-	return func(c *copter.C) {
+	return func(c *ace.C) {
 		req := c.Request
 		if !strings.Contains(req.Header.Get(headerAcceptEncoding), encodingGzip) {
 			c.Next()

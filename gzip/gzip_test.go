@@ -2,7 +2,7 @@ package gzip
 
 import (
 	"compress/gzip"
-	"github.com/plimble/copter"
+	"github.com/plimble/ace"
 	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
@@ -14,12 +14,12 @@ const (
 	testResponse = "Gzip Test Response "
 )
 
-func newServer(useGzip bool) *copter.Copter {
-	r := copter.New()
+func newServer(useGzip bool) *ace.ace {
+	r := ace.New()
 	if useGzip {
 		r.Use(Gzip(DefaultCompression))
 	}
-	r.GET("/", func(c *copter.C) {
+	r.GET("/", func(c *ace.C) {
 		c.Writer.Header().Set(headerContentLength, strconv.Itoa(len(testResponse)))
 		c.String(200, testResponse)
 	})
