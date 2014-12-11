@@ -25,7 +25,7 @@ type Options struct {
 }
 
 // Middleware sets CORS headers for every request
-func Middleware(options Options) ace.HandlerFunc {
+func Cors(options Options) ace.HandlerFunc {
 	if options.AllowHeaders == nil {
 		options.AllowHeaders = defaultAllowHeaders
 	}
