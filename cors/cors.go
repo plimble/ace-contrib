@@ -30,46 +30,43 @@ func Cors(options Options) ace.HandlerFunc {
 		options.AllowHeaders = defaultAllowHeaders
 	}
 
-	if options.AllowMethods == nil {
+	if options.AllowMethods == nil || len(options.AllowMethods) == 0 {
 		options.AllowMethods = defaultAllowMethods
 	}
 
-	return func(c *ace.C) {
-		req := c.Request
-		res := c.Writer
-		origin := req.Header.Get("Origin")
-		requestMethod := req.Header.Get("Access-Control-Request-Method")
-		requestHeaders := req.Header.Get("Access-Control-Request-Headers")
+	allowOrigin := "*"
+	if len(options.AllowOrigins) > 0 {
+		allowOrigin = strings.Join(options.AllowOrigins, " ")
+	}
+	exposeHeader := strings.Join(options.ExposeHeaders, ",")
+	allowMethod := strings.Join(options.AllowMethods, ",")
+	allowHeader := strings.Join(options.AllowHeaders, ",")
 
-		if len(options.AllowOrigins) > 0 {
-			res.Header().Set("Access-Control-Allow-Origin", strings.Join(options.AllowOrigins, " "))
-		} else {
-			res.Header().Set("Access-Control-Allow-Origin", origin)
-		}
+	maxAge := ""
+	if options.MaxAge > time.Duration(0) {
+		maxAge = strconv.FormatInt(int64(options.MaxAge/time.Second), 10)
+	}
+
+	return func(c *ace.C) {
+		// origin := c.Request.Header.Get("Origin")
+		// requestMethod := c.Request.Header.Get("Access-Control-Request-Method")
+		// requestHeaders := c.Request.Header.Get("Access-Control-Request-Headers")
+		c.Writer.Header().Set("Access-Control-Allow-Origin", allowOrigin)
 
 		if options.AllowCredentials {
-			res.Header().Set("Access-Control-Allow-Credentials", "true")
+			c.Writer.Header().Set("Access-Control-Allow-Credentials", "true")
 		}
 
-		if len(options.ExposeHeaders) > 0 {
-			res.Header().Set("Access-Control-Expose-Headers", strings.Join(options.ExposeHeaders, ","))
+		if exposeHeader != "" {
+			c.Writer.Header().Set("Access-Control-Expose-Headers", exposeHeader)
 		}
 
-		if req.Method == "OPTIONS" {
-			if len(options.AllowMethods) > 0 {
-				res.Header().Set("Access-Control-Allow-Methods", strings.Join(options.AllowMethods, ","))
-			} else if requestMethod != "" {
-				res.Header().Set("Access-Control-Allow-Methods", requestMethod)
-			}
+		if c.Request.Method == "OPTIONS" {
+			c.Writer.Header().Set("Access-Control-Allow-Methods", allowMethod)
+			c.Writer.Header().Set("Access-Control-Allow-Headers", allowHeader)
 
-			if len(options.AllowHeaders) > 0 {
-				res.Header().Set("Access-Control-Allow-Headers", strings.Join(options.AllowHeaders, ","))
-			} else if requestHeaders != "" {
-				res.Header().Set("Access-Control-Allow-Headers", requestHeaders)
-			}
-
-			if options.MaxAge > time.Duration(0) {
-				res.Header().Set("Access-Control-Max-Age", strconv.FormatInt(int64(options.MaxAge/time.Second), 10))
+			if maxAge != "" {
+				c.Writer.Header().Set("Access-Control-Max-Age", maxAge)
 			}
 
 			c.Abort(http.StatusOK)
