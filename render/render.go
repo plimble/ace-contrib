@@ -15,7 +15,7 @@ type Render struct {
 type Options render.Options
 
 func New(options Options) *Render {
-	options.Funcs = append(options.Funcs, template.FuncMap{"esp": esp})
+	options.Funcs = append(options.Funcs, template.FuncMap{"safe": safe})
 	options.Funcs = append(options.Funcs, template.FuncMap{"length": length})
 	options.Funcs = append(options.Funcs, template.FuncMap{"date": date})
 	options.Funcs = append(options.Funcs, template.FuncMap{"ISO8601": ISO8601})
@@ -23,7 +23,7 @@ func New(options Options) *Render {
 	return &Render{render.New(render.Options(options))}
 }
 
-func esp(s string) string {
+func safe(s string) string {
 	return html.EscapeString(s)
 }
 
