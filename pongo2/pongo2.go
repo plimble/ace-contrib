@@ -17,7 +17,7 @@ type pongo2 struct {
 }
 
 func (p *pongo2) Render(w http.ResponseWriter, name string, data interface{}) {
-	p.copter.ExecW(name, data, w)
+	p.copter.ExecW(name, data.(map[string]interface{}), w)
 }
 
 func Pongo2(options *TemplateOptions) ace.Renderer {
