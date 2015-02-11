@@ -69,7 +69,7 @@ func Cors(options Options) ace.HandlerFunc {
 				c.Writer.Header().Set("Access-Control-Max-Age", maxAge)
 			}
 
-			c.Abort(http.StatusOK)
+			c.AbortWithStatus(http.StatusOK)
 		} else {
 			c.Next()
 		}

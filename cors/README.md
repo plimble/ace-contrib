@@ -1,25 +1,25 @@
 # ace-cors
 
-CORS middleware for [Gin].
+CORS middleware for [ACE](https://github.com/plimble/ace)
 
 ## Installation
 
 ``` bash
-$ go get github.com/plimble/ace/cors
+$ go get github.com/plimble/ace-contrib/cors
 ```
 
 ## Usage
 
 ``` go
 import (
-    "github.com/gin-gonic/gin"
+    "github.com/plimble/ace"
     "github.com/plimble/ace/cors"
 )
 
 func main(){
-    g := gin.New()
-    g.Use(cors.Middleware(cors.Options{}))
+    a := ace.New()
+    a.Use(cors.Middleware(cors.Options{}))
 }
 ```
 
-[Gin]: http://gin-gonic.github.io/gin/
+[ACE]: https://github.com/plimble/ace
