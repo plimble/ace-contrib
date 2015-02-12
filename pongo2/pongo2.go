@@ -17,6 +17,9 @@ type pongo2 struct {
 }
 
 func (p *pongo2) Render(w http.ResponseWriter, name string, data interface{}) {
+	if data == nil {
+		data = make(map[string]interface{})
+	}
 	p.copter.ExecW(name, data.(map[string]interface{}), w)
 }
 
