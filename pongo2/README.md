@@ -18,9 +18,10 @@ func main() {
 	a := ace.New()
 
 	render := pongo2.Pongo2(&pongo2.TemplateOptions{
-		Directory:     "./public",
-		Extensions:    []string{"html"},
+		Directory:     "./public", //default "./"
+		Extensions:    []string{"html"}, //default []string{".tpl",".html"}
 		IsDevelopment: true, // if true enable cache template
+		PoolSize: 		 64, //Buffer Pool size default 100
 	})
 	a.HtmlTemplate(render)
 	a.GET("/", homePage)

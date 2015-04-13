@@ -10,6 +10,7 @@ type TemplateOptions struct {
 	Directory     string
 	Extensions    []string
 	IsDevelopment bool
+	PoolSize      int
 }
 
 type pongo2 struct {
@@ -29,6 +30,7 @@ func Pongo2(options *TemplateOptions) ace.Renderer {
 			Directory:     options.Directory,
 			Extensions:    options.Extensions,
 			IsDevelopment: options.IsDevelopment,
+			PoolSize:      options.PoolSize,
 		}),
 	}
 }
