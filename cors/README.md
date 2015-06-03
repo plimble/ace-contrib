@@ -13,12 +13,12 @@ $ go get github.com/plimble/ace-contrib/cors
 ``` go
 import (
     "github.com/plimble/ace"
-    "github.com/plimble/ace/cors"
+    "github.com/plimble/ace-contrib/cors"
 )
 
 func main(){
     a := ace.New()
-    a.Use(cors.Middleware(cors.Options{}))
+    a.Use(cors.Cors(cors.Options{}))
 }
 ```
 
