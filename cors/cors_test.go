@@ -11,10 +11,6 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func init() {
-	gin.SetMode(gin.TestMode)
-}
-
 type requestOptions struct {
 	Method  string
 	URL     string
@@ -22,7 +18,7 @@ type requestOptions struct {
 	Body    io.Reader
 }
 
-func request(server *gin.Engine, options requestOptions) *httptest.ResponseRecorder {
+func request(server *ace.Ace, options requestOptions) *httptest.ResponseRecorder {
 	if options.Method == "" {
 		options.Method = "GET"
 	}
@@ -45,9 +41,9 @@ func request(server *gin.Engine, options requestOptions) *httptest.ResponseRecor
 	return w
 }
 
-func newServer() *gin.Engine {
-	g := gin.New()
-	g.Use(Middleware(Options{}))
+func newServer() *ace.Ace {
+	g := ace.New()
+	g.Use(Cors(Options{}))
 
 	return g
 }
@@ -56,7 +52,7 @@ func TestDefault(t *testing.T) {
 	g := newServer()
 	assert := assert.New(t)
 
-	g.GET("/test", func(c *gin.Context) {
+	g.GET("/test", func(c *ace.C) {
 		c.String(http.StatusOK, "OK")
 	})
 
@@ -72,13 +68,13 @@ func TestDefault(t *testing.T) {
 }
 
 func TestAllowOrigins(t *testing.T) {
-	g := gin.New()
-	g.Use(Middleware(Options{
+	g := ace.New()
+	g.Use(Cors(Options{
 		AllowOrigins: []string{"http://maji.moe", "http://example.com"},
 	}))
 	assert := assert.New(t)
 
-	g.GET("/test", func(c *gin.Context) {
+	g.GET("/test", func(c *ace.C) {
 		c.String(http.StatusOK, "OK")
 	})
 
@@ -94,13 +90,13 @@ func TestAllowOrigins(t *testing.T) {
 }
 
 func TestAllowCredentials(t *testing.T) {
-	g := gin.New()
-	g.Use(Middleware(Options{
+	g := ace.New()
+	g.Use(Cors(Options{
 		AllowCredentials: true,
 	}))
 	assert := assert.New(t)
 
-	g.GET("/test", func(c *gin.Context) {
+	g.GET("/test", func(c *ace.C) {
 		c.String(http.StatusOK, "OK")
 	})
 
@@ -116,13 +112,13 @@ func TestAllowCredentials(t *testing.T) {
 }
 
 func TestExposeHeaders(t *testing.T) {
-	g := gin.New()
-	g.Use(Middleware(Options{
+	g := ace.New()
+	g.Use(Cors(Options{
 		ExposeHeaders: []string{"Foo", "Bar"},
 	}))
 	assert := assert.New(t)
 
-	g.GET("/test", func(c *gin.Context) {
+	g.GET("/test", func(c *ace.C) {
 		c.String(http.StatusOK, "OK")
 	})
 
@@ -157,8 +153,8 @@ func TestOptionsRequest(t *testing.T) {
 }
 
 func TestAllowMethods(t *testing.T) {
-	g := gin.New()
-	g.Use(Middleware(Options{
+	g := ace.New()
+	g.Use(Cors(Options{
 		AllowMethods: []string{"GET", "POST", "PUT"},
 	}))
 	assert := assert.New(t)
@@ -175,8 +171,8 @@ func TestAllowMethods(t *testing.T) {
 }
 
 func TestRequestMethod(t *testing.T) {
-	g := gin.New()
-	g.Use(Middleware(Options{
+	g := ace.New()
+	g.Use(Cors(Options{
 		AllowMethods: []string{},
 	}))
 	assert := assert.New(t)
@@ -194,8 +190,8 @@ func TestRequestMethod(t *testing.T) {
 }
 
 func TestAllowHeaders(t *testing.T) {
-	g := gin.New()
-	g.Use(Middleware(Options{
+	g := ace.New()
+	g.Use(Cors(Options{
 		AllowHeaders: []string{"X-Custom-Header", "X-Auth-Token"},
 	}))
 	assert := assert.New(t)
@@ -212,8 +208,8 @@ func TestAllowHeaders(t *testing.T) {
 }
 
 func TestRequestHeaders(t *testing.T) {
-	g := gin.New()
-	g.Use(Middleware(Options{
+	g := ace.New()
+	g.Use(Cors(Options{
 		AllowHeaders: []string{},
 	}))
 	assert := assert.New(t)
@@ -231,8 +227,8 @@ func TestRequestHeaders(t *testing.T) {
 }
 
 func TestMaxAge(t *testing.T) {
-	g := gin.New()
-	g.Use(Middleware(Options{
+	g := ace.New()
+	g.Use(Cors(Options{
 		MaxAge: time.Hour,
 	}))
 	assert := assert.New(t)
