@@ -63,7 +63,7 @@ func TestDefault(t *testing.T) {
 		},
 	})
 
-	assert.Equal("http://maji.moe", r.Header().Get("Access-Control-Allow-Origin"))
+	assert.Equal("*", r.Header().Get("Access-Control-Allow-Origin"))
 	assert.Equal("OK", r.Body.String())
 }
 
@@ -136,6 +136,9 @@ func TestExposeHeaders(t *testing.T) {
 func TestOptionsRequest(t *testing.T) {
 	g := newServer()
 	assert := assert.New(t)
+	g.OPTIONS("/", func(c *ace.C) {
+		c.String(http.StatusOK, "")
+	})
 
 	r := request(g, requestOptions{
 		Method: "OPTIONS",
@@ -145,7 +148,7 @@ func TestOptionsRequest(t *testing.T) {
 		},
 	})
 
-	assert.Equal("http://maji.moe", r.Header().Get("Access-Control-Allow-Origin"))
+	assert.Equal("*", r.Header().Get("Access-Control-Allow-Origin"))
 	assert.Equal("GET,POST,PUT,DELETE,PATCH,HEAD", r.Header().Get("Access-Control-Allow-Methods"))
 	assert.Equal("Origin,Accept,Content-Type,Authorization", r.Header().Get("Access-Control-Allow-Headers"))
 	assert.Equal("", r.Body.String())
@@ -157,6 +160,10 @@ func TestAllowMethods(t *testing.T) {
 	g.Use(Cors(Options{
 		AllowMethods: []string{"GET", "POST", "PUT"},
 	}))
+	g.OPTIONS("/", func(c *ace.C) {
+		c.String(http.StatusOK, "")
+	})
+
 	assert := assert.New(t)
 
 	r := request(g, requestOptions{
@@ -186,7 +193,7 @@ func TestRequestMethod(t *testing.T) {
 		},
 	})
 
-	assert.Equal("PUT", r.Header().Get("Access-Control-Allow-Methods"))
+	assert.Equal("", r.Header().Get("Access-Control-Allow-Methods"))
 }
 
 func TestAllowHeaders(t *testing.T) {
@@ -195,6 +202,9 @@ func TestAllowHeaders(t *testing.T) {
 		AllowHeaders: []string{"X-Custom-Header", "X-Auth-Token"},
 	}))
 	assert := assert.New(t)
+	g.OPTIONS("/", func(c *ace.C) {
+		c.String(http.StatusOK, "")
+	})
 
 	r := request(g, requestOptions{
 		Method: "OPTIONS",
@@ -210,9 +220,12 @@ func TestAllowHeaders(t *testing.T) {
 func TestRequestHeaders(t *testing.T) {
 	g := ace.New()
 	g.Use(Cors(Options{
-		AllowHeaders: []string{},
+		AllowHeaders: []string{"Foo", "Bar"},
 	}))
 	assert := assert.New(t)
+	g.OPTIONS("/", func(c *ace.C) {
+		c.String(http.StatusOK, "")
+	})
 
 	r := request(g, requestOptions{
 		Method: "OPTIONS",
@@ -232,6 +245,9 @@ func TestMaxAge(t *testing.T) {
 		MaxAge: time.Hour,
 	}))
 	assert := assert.New(t)
+	g.OPTIONS("/", func(c *ace.C) {
+		c.String(http.StatusOK, "")
+	})
 
 	r := request(g, requestOptions{
 		Method: "OPTIONS",
